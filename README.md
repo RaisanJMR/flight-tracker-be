@@ -31,10 +31,20 @@ npm run convert:airports
 
 Base URL: `http://localhost:3000`
 
-### Health check
+### Home page
 
 ```
 GET /
+```
+
+Serves the project home page (`public/index.html`) with setup, API docs, and schema details.
+
+---
+
+### Health check
+
+```
+GET /api/health
 ```
 
 **Response** `200`

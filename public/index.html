@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flight Tracker API</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0b1c2c;
+      --sky: #1a6b9a;
+      --sky-bright: #3aa0d8;
+      --runway: #e8a838;
+      --mist: #e8f1f6;
+      --paper: #f4f8fb;
+      --line: rgba(11, 28, 44, 0.12);
+      --muted: #4a6578;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "IBM Plex Sans", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.55;
+    }
+
+    /* —— Hero —— */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2rem clamp(1.25rem, 4vw, 4rem) 3.5rem;
+      color: #f5fafc;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(8, 22, 36, 0.35) 0%, rgba(8, 22, 36, 0.82) 70%, rgba(8, 22, 36, 0.95) 100%),
+        url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1920&q=80")
+          center / cover no-repeat;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 50% at 70% 20%, rgba(58, 160, 216, 0.25), transparent 60%);
+      pointer-events: none;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift {
+      from { transform: translateX(-2%) scale(1); }
+      to { transform: translateX(3%) scale(1.05); }
+    }
+
+    .hero-brand {
+      position: relative;
+      z-index: 1;
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(4.5rem, 14vw, 9rem);
+      letter-spacing: 0.04em;
+      line-height: 0.9;
+      opacity: 0;
+      animation: rise 0.9s ease forwards 0.15s;
+    }
+
+    .hero h1 {
+      position: relative;
+      z-index: 1;
+      margin-top: 1rem;
+      max-width: 18ch;
+      font-size: clamp(1.35rem, 2.8vw, 2rem);
+      font-weight: 500;
+      opacity: 0;
+      animation: rise 0.9s ease forwards 0.35s;
+    }
+
+    .hero p {
+      position: relative;
+      z-index: 1;
+      margin-top: 0.75rem;
+      max-width: 42ch;
+      color: rgba(245, 250, 252, 0.85);
+      font-size: 1.05rem;
+      opacity: 0;
+      animation: rise 0.9s ease forwards 0.5s;
+    }
+
+    .hero-actions {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.75rem;
+      opacity: 0;
+      animation: rise 0.9s ease forwards 0.65s;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(1.25rem); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.7rem 1.25rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background: var(--runway);
+      color: var(--ink);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: #f5fafc;
+      outline: 1px solid rgba(245, 250, 252, 0.45);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(245, 250, 252, 0.1);
+    }
+
+    /* —— Layout —— */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 clamp(1.25rem, 4vw, 2rem) 4rem;
+    }
+
+    section {
+      padding-top: 3.5rem;
+    }
+
+    section + section {
+      border-top: 1px solid var(--line);
+      margin-top: 3.5rem;
+    }
+
+    .section-label {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--sky);
+      margin-bottom: 0.5rem;
+    }
+
+    h2 {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      letter-spacing: 0.03em;
+      margin-bottom: 0.75rem;
+    }
+
+    .lead {
+      color: var(--muted);
+      max-width: 52ch;
+      margin-bottom: 1.5rem;
+    }
+
+    /* —— Overview strip —— */
+    .overview-list {
+      display: grid;
+      gap: 1rem;
+      list-style: none;
+    }
+
+    @media (min-width: 640px) {
+      .overview-list {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .overview-list li {
+      padding: 1rem 0;
+      border-top: 2px solid var(--sky);
+    }
+
+    .overview-list strong {
+      display: block;
+      font-size: 1.5rem;
+      font-family: "Bebas Neue", sans-serif;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+    }
+
+    .overview-list span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* —— Setup —— */
+    pre, code {
+      font-family: "IBM Plex Mono", monospace;
+    }
+
+    pre {
+      background: var(--ink);
+      color: #d4e8f2;
+      padding: 1rem 1.15rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      margin: 0.75rem 0 1.25rem;
+      border-left: 3px solid var(--runway);
+    }
+
+    code.inline {
+      background: var(--mist);
+      padding: 0.1em 0.35em;
+      font-size: 0.9em;
+    }
+
+    /* —— Endpoints —— */
+    .endpoint {
+      margin-bottom: 2.5rem;
+    }
+
+    .endpoint-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.5rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .method {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      background: var(--sky);
+      color: #fff;
+      padding: 0.25rem 0.5rem;
+    }
+
+    .path {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .endpoint p {
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin: 0.75rem 0 1.25rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.65rem 0.75rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: var(--mist);
+    }
+
+    td code {
+      font-size: 0.85em;
+      color: var(--sky);
+    }
+
+    .try-link {
+      display: inline-block;
+      margin-top: 0.25rem;
+      color: var(--sky);
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .try-link:hover {
+      color: var(--ink);
+      border-bottom-color: var(--runway);
+    }
+
+    footer {
+      margin-top: 4rem;
+      padding: 2rem clamp(1.25rem, 4vw, 2rem);
+      border-top: 1px solid var(--line);
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: var(--sky);
+      font-weight: 600;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <p class="hero-brand">Flight Tracker</p>
+    <h1>Airport data API for search and discovery</h1>
+    <p>86,000+ airports as JSON — with pagination and name search.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#apis">View APIs</a>
+      <a class="btn btn-ghost" href="#schema">View schema</a>
+    </div>
+  </header>
+
+  <main>
+    <section id="overview">
+      <p class="section-label">Overview</p>
+      <h2>Project at a glance</h2>
+      <p class="lead">
+        Flight Tracker exposes airport records through a simple REST API with pagination and name search.
+      </p>
+      <ul class="overview-list">
+        <li>
+          <strong>86,258</strong>
+          <span>Airports in the dataset</span>
+        </li>
+        <li>
+          <strong>Pagination</strong>
+          <span>Page and limit on every list</span>
+        </li>
+        <li>
+          <strong>Name search</strong>
+          <span>Filter airports by name</span>
+        </li>
+      </ul>
+    </section>
+
+    <section id="apis">
+      <p class="section-label">APIs</p>
+      <h2>Endpoints</h2>
+      <p class="lead">All responses are JSON. List endpoints support pagination and optional name search.</p>
+
+      <article class="endpoint">
+        <div class="endpoint-head">
+          <span class="method">GET</span>
+          <span class="path">/api/health</span>
+        </div>
+        <p>Health check — confirms the API process is running.</p>
+        <pre>{
+  "message": "Flight Tracker API is running",
+  "status": "ok"
+}</pre>
+        <a class="try-link" href="/api/health" target="_blank" rel="noopener">Try it →</a>
+      </article>
+
+      <article class="endpoint">
+        <div class="endpoint-head">
+          <span class="method">GET</span>
+          <span class="path">/api/airports</span>
+        </div>
+        <p>Paginated airport list. Filter by name with <code class="inline">search</code> or <code class="inline">name</code>.</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>page</code></td>
+              <td>number</td>
+              <td>1</td>
+              <td>Page number (min 1)</td>
+            </tr>
+            <tr>
+              <td><code>limit</code></td>
+              <td>number</td>
+              <td>20</td>
+              <td>Items per page (1–100)</td>
+            </tr>
+            <tr>
+              <td><code>search</code></td>
+              <td>string</td>
+              <td>—</td>
+              <td>Case-insensitive partial match on airport name</td>
+            </tr>
+            <tr>
+              <td><code>name</code></td>
+              <td>string</td>
+              <td>—</td>
+              <td>Alias for <code>search</code></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>Response shape</p>
+        <pre>{
+  "data": [ /* airport objects */ ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 86258,
+    "totalPages": 4313,
+    "hasNext": true,
+    "hasPrev": false
+  },
+  "search": null
+}</pre>
+
+        <p>Examples</p>
+        <pre>curl "http://localhost:3000/api/airports"
+curl "http://localhost:3000/api/airports?page=2&amp;limit=10"
+curl "http://localhost:3000/api/airports?search=Heathrow"
+curl "http://localhost:3000/api/airports?name=Delhi&amp;page=1&amp;limit=5"</pre>
+
+        <a class="try-link" href="/api/airports?limit=5" target="_blank" rel="noopener">Try list →</a>
+        &nbsp;·&nbsp;
+        <a class="try-link" href="/api/airports?search=Heathrow&amp;limit=5" target="_blank" rel="noopener">Try search →</a>
+      </article>
+
+      <article class="endpoint">
+        <div class="endpoint-head">
+          <span class="method">GET</span>
+          <span class="path">/api/airports/:id</span>
+        </div>
+        <p>Single airport by numeric ID. Returns <code class="inline">404</code> if not found.</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>id</code></td>
+              <td>number</td>
+              <td>Airport ID (path)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <pre>curl "http://localhost:3000/api/airports/2434"</pre>
+        <a class="try-link" href="/api/airports/2434" target="_blank" rel="noopener">Try Heathrow (id 2434) →</a>
+      </article>
+    </section>
+
+    <section id="schema">
+      <p class="section-label">Schema</p>
+      <h2>Airport object fields</h2>
+      <p class="lead">Each item in <code class="inline">data</code> (and the get-by-id response) includes these fields.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>number</td><td>Unique airport ID</td></tr>
+          <tr><td><code>ident</code></td><td>string</td><td>Airport identifier</td></tr>
+          <tr><td><code>type</code></td><td>string</td><td>e.g. large_airport, small_airport, heliport</td></tr>
+          <tr><td><code>name</code></td><td>string</td><td>Airport name</td></tr>
+          <tr><td><code>latitude_deg</code></td><td>number</td><td>Latitude</td></tr>
+          <tr><td><code>longitude_deg</code></td><td>number</td><td>Longitude</td></tr>
+          <tr><td><code>elevation_ft</code></td><td>number</td><td>Elevation in feet</td></tr>
+          <tr><td><code>continent</code></td><td>string</td><td>Continent code</td></tr>
+          <tr><td><code>iso_country</code></td><td>string</td><td>ISO country code</td></tr>
+          <tr><td><code>iso_region</code></td><td>string</td><td>ISO region code</td></tr>
+          <tr><td><code>municipality</code></td><td>string</td><td>City / municipality</td></tr>
+          <tr><td><code>scheduled_service</code></td><td>string</td><td>yes or no</td></tr>
+          <tr><td><code>icao_code</code></td><td>string</td><td>ICAO code</td></tr>
+          <tr><td><code>iata_code</code></td><td>string</td><td>IATA code</td></tr>
+          <tr><td><code>gps_code</code></td><td>string</td><td>GPS code</td></tr>
+          <tr><td><code>local_code</code></td><td>string</td><td>Local code</td></tr>
+          <tr><td><code>home_link</code></td><td>string</td><td>Official website URL</td></tr>
+          <tr><td><code>wikipedia_link</code></td><td>string</td><td>Wikipedia URL</td></tr>
+          <tr><td><code>keywords</code></td><td>string</td><td>Alternate names / keywords</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    Flight Tracker API · open <a href="/api/airports?limit=5">/api/airports</a> or <a href="/api/health">/api/health</a>
+  </footer>
+</body>
+</html>
