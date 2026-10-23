@@ -368,6 +368,7 @@
       <p class="section-label">APIs</p>
       <h2>Endpoints</h2>
       <p class="lead">All responses are JSON. List endpoints support pagination and optional name search.</p>
+      <p>Base URL: <code class="inline">https://flight-tracker-be.onrender.com</code></p>
 
       <article class="endpoint">
         <div class="endpoint-head">
@@ -441,10 +442,10 @@
 }</pre>
 
         <p>Examples</p>
-        <pre>curl "http://localhost:3000/api/airports"
-curl "http://localhost:3000/api/airports?page=2&amp;limit=10"
-curl "http://localhost:3000/api/airports?search=Heathrow"
-curl "http://localhost:3000/api/airports?name=Delhi&amp;page=1&amp;limit=5"</pre>
+        <pre>curl "https://flight-tracker-be.onrender.com/api/airports"
+curl "https://flight-tracker-be.onrender.com/api/airports?page=2&amp;limit=10"
+curl "https://flight-tracker-be.onrender.com/api/airports?search=Heathrow"
+curl "https://flight-tracker-be.onrender.com/api/airports?name=Delhi&amp;page=1&amp;limit=5"</pre>
 
         <a class="try-link" href="/api/airports?limit=5" target="_blank" rel="noopener">Try list →</a>
         &nbsp;·&nbsp;
@@ -475,7 +476,7 @@ curl "http://localhost:3000/api/airports?name=Delhi&amp;page=1&amp;limit=5"</pre
           </tbody>
         </table>
 
-        <pre>curl "http://localhost:3000/api/airports/2434"</pre>
+        <pre>curl "https://flight-tracker-be.onrender.com/api/airports/2434"</pre>
         <a class="try-link" href="/api/airports/2434" target="_blank" rel="noopener">Try Heathrow (id 2434) →</a>
       </article>
     </section>
